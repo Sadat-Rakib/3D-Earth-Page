@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive 3D Earth visualization with realistic atmosphere and lighting">
+    <title>Earth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <canvas class="webgl"></canvas>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <div class="loader-logo-m" style="width: 48px; height: 48px; background: rgba(20, 25, 35, 0.9); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px; color: white; letter-spacing: -0.5px;">M</div>
+                <span class="loader-logo-text">EARTH</span>
+            </div>
+            <div class="loader-bar-wrap">
+                <div class="loader-bar" id="loaderBar"></div>
+            </div>
+            <div class="loader-percent" id="loaderPercent">0%</div>
+        </div>
+    </div>
+
+    <!-- Explore Mode Overlay (hidden by default) -->
+    <div class="explore-overlay" id="exploreOverlay">
+        <div class="explore-hud">
+            <div class="explore-info">
+                <div class="explore-info-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 15l-2 5L9 9l11 4-5 2zm-2.414-2.414L21 4"/></svg>
+                    <span>Drag to rotate</span>
+                </div>
+                <div class="explore-info-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v6M8 11h6"/></svg>
+                    <span>Scroll to zoom</span>
+                </div>
+            </div>
+            <button class="explore-close" id="exploreClose" aria-label="Close explore mode">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="explore-bottom">
+            <div class="explore-label">360&deg; Interactive Mode</div>
+            <div class="explore-stats">
+                <div class="explore-stat"><span class="explore-stat-val">6,371</span><span class="explore-stat-lbl">Radius (km)</span></div>
+                <div class="explore-stat"><span class="explore-stat-val">1,670</span><span class="explore-stat-lbl">Rotation km/h</span></div>
+                <div class="explore-stat"><span class="explore-stat-val">107,226</span><span class="explore-stat-lbl">Orbit km/h</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="scroll-container" id="scrollContainer">
+
+        <!-- Navigation -->
+        <nav class="nav" id="nav">
+            <div class="nav-logo">
+                <div class="nav-logo-m" style="width: 26px; height: 26px; background: rgba(20, 25, 35, 0.9); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: white; letter-spacing: -0.5px;">M</div>
+                <span class="nav-logo-text">EARTH</span>
+            </div>
+            <div class="nav-center" id="navLinks">
+                <a href="#s-hero" class="nav-link active">Home</a>
+                <a href="#s-discover" class="nav-link">Discover</a>
+                <a href="#s-life" class="nav-link">Life</a>
+                <a href="#s-data" class="nav-link">Data</a>
+            </div>
+            <div class="nav-right">
+                <button class="explore-btn" id="exploreBtn" aria-label="360 Explore">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg>
+                    <span>360&deg;</span>
+                </button>
+                <button id="musicButton" aria-label="Toggle music">
+                    <span class="music-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Section 1: Hero -->
+        <section class="section" id="s-hero">
+            <div class="section-inner section-inner--left">
+                <div class="content-card">
+                    <div class="hero-badge"><span class="badge-dot"></span><span>● LIVE 3D JOURNEY</span></div>
+                    <h1 class="section-title">
+                        <span class="t-light">One Planet.</span>
+                        <span class="t-bold">No Backup.</span>
+                    </h1>
+                    <p class="section-text">Suspended in the void. 4.5 billion years in the making. This is home; every ocean, mountain, breath of air, and heartbeat of life. Spin it. Study it. Never forget what's at stake.</p>
+                    <div class="hero-actions">
+                        <a href="#s-discover" class="btn btn-primary"><span>BEGIN THE JOURNEY →</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+                        <a href="#s-life" class="btn btn-ghost">WHAT'S THIS?</a>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-hint"><div class="scroll-line"></div><span>Scroll</span></div>
+        </section>
+
+        <!-- Section 2: Discover -->
+        <section class="section" id="s-discover">
+            <div class="section-inner section-inner--right">
+                <div class="content-card">
+                    <div class="section-label">Discover</div>
+                    <h2 class="section-title"><span class="t-light">The Only Address</span><span class="t-bold">In The Universe.</span></h2>
+                    <p class="section-text">Third rock from the Sun. The sole confirmed harbour of life in all of known existence. Seven continents. Five oceans. 8.7 million species. And one fragile atmosphere standing between us and oblivion.</p>
+                    <div class="stats-grid">
+                        <div class="stat-card"><span class="stat-value">12,742</span><span class="stat-label">Diameter (km)</span></div>
+                        <div class="stat-card"><span class="stat-value">365.25</span><span class="stat-label">Orbital Period (days)</span></div>
+                        <div class="stat-card"><span class="stat-value">7.9 B</span><span class="stat-label">Population</span></div>
+                        <div class="stat-card"><span class="stat-value">71%</span><span class="stat-label">Water Surface</span></div>
+                        <div class="stat-card"><span class="stat-value">5.97</span><span class="stat-label">Mass (&#215;10&#178;&#8308; kg)</span></div>
+                        <div class="stat-card"><span class="stat-value">1 AU</span><span class="stat-label">Solar Distance</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Life -->
+        <section class="section" id="s-life">
+            <div class="section-inner section-inner--left">
+                <div class="content-card">
+                    <div class="section-label">Life on Earth</div>
+                    <h2 class="section-title"><span class="t-light">Breathtakingly</span><span class="t-bold">Alive.</span></h2>
+                    <p class="section-text">Pull one thread and the whole tapestry shifts. Earth's 8.7 million known species don't just coexist; they co-create. Every forest, reef, and microbe is load-bearing architecture in a living system that took billions of years to perfect.</p>
+                    <div class="features-col">
+                        <div class="feature-row">
+                            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
+                            <div><h3 class="feature-title">Global Ecosystem</h3><p class="feature-text">From arctic tundra to tropical canopy; 14 major biomes locked in constant, elegant conversation.</p></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/><circle cx="12" cy="12" r="4"/></svg></div>
+                            <div><h3 class="feature-title">Solar Powered</h3><p class="feature-text">150 million kilometres away, our star pumps ~1,361 watts per square metre into every system on Earth. Zero waste. Zero invoices.</p></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg></div>
+                            <div><h3 class="feature-title">4.5 Billion Years</h3><p class="feature-text">Forged in stellar debris. Sculpted by collision, eruption, and ice. Earth's age isn't a number; it's a story written in every rock layer and canyon wall.</p></div>
+                        </div>
+                        <div class="feature-row">
+                            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+                            <div><h3 class="feature-title">8.7 Million Species</h3><p class="feature-text">From extremophiles in volcanic vents to eagles in alpine thermals; life here doesn't just survive. It thrives in every corner it can reach.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Data -->
+        <section class="section" id="s-data">
+            <div class="section-inner section-inner--right">
+                <div class="content-card">
+                    <div class="section-label">Key Data</div>
+                    <h2 class="section-title"><span class="t-light">Earth, Measured</span><span class="t-bold">To The Bone.</span></h2>
+                    <p class="section-text">Strip away the poetry and what remains is still extraordinary. Every measurement here represents billions of years of cosmic engineering, calibrated to produce something utterly improbable: us.</p>
+                    <div class="data-list">
+                        <div class="data-row"><span class="data-key">Distance from Sun</span><span class="data-val">149.6M km</span></div>
+                        <div class="data-row"><span class="data-key">Surface Temperature</span><span class="data-val">15&deg;C avg</span></div>
+                        <div class="data-row"><span class="data-key">Atmosphere</span><span class="data-val">78% N&#8322;, 21% O&#8322;</span></div>
+                        <div class="data-row"><span class="data-key">Axial Tilt</span><span class="data-val">23.44&deg;</span></div>
+                        <div class="data-row"><span class="data-key">Rotation Period</span><span class="data-val">23h 56m 4s</span></div>
+                        <div class="data-row"><span class="data-key">Natural Satellites</span><span class="data-val">1 (Moon)</span></div>
+                        <div class="data-row"><span class="data-key">Escape Velocity</span><span class="data-val">11.186 km/s</span></div>
+                        <div class="data-row"><span class="data-key">Surface Gravity</span><span class="data-val">9.807 m/s&sup2;</span></div>
+                        <div class="data-row"><span class="data-key">Magnetic Field</span><span class="data-val">25&ndash;65 &micro;T</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Gallery -->
+        <section class="section section--gallery" id="s-gallery">
+            <div class="gallery-section">
+                <div class="gallery-header">
+                    <div class="section-label">Gallery</div>
+                    <h2 class="section-title"><span class="t-light">Views From</span><span class="t-bold">Space</span></h2>
+                </div>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="./1.webp" alt="Earth from space" loading="lazy">
+                        <div class="gallery-caption">
+                            <span class="gallery-caption-title">Blue Marble</span>
+                            <span class="gallery-caption-sub">View from orbit</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./2.jpg" alt="Earth atmosphere" loading="lazy">
+                        <div class="gallery-caption">
+                            <span class="gallery-caption-title">Atmosphere</span>
+                            <span class="gallery-caption-sub">Layers of protection</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./3.webp" alt="Earth surface" loading="lazy">
+                        <div class="gallery-caption">
+                            <span class="gallery-caption-title">Surface Detail</span>
+                            <span class="gallery-caption-sub">Continents & oceans</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./5.jpeg" alt="Earth panorama" loading="lazy">
+                        <div class="gallery-caption">
+                            <span class="gallery-caption-title">Panorama</span>
+                            <span class="gallery-caption-sub">Horizon perspective</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./4.webp" alt="Earth clouds" loading="lazy">
+                        <div class="gallery-caption">
+                            <span class="gallery-caption-title">Cloud Systems</span>
+                            <span class="gallery-caption-sub">Weather patterns</span>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="./6.png" alt="Earth night" loading="lazy">
+                        <div class="gallery-caption">
+                            <span class="gallery-caption-title">Night Side</span>
+                            <span class="gallery-caption-sub">City lights glow</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Future -->
+        <section class="section" id="s-future">
+            <div class="section-inner section-inner--center">
+                <div class="content-card content-card--wide">
+                    <div class="section-label">Our Future</div>
+                    <h2 class="section-title"><span class="t-light">We Are The</span><span class="t-bold">Last Generation.</span></h2>
+                    <p class="section-text section-text--center">Not a political statement. A scientific one. The window to act is measurable in years, not centuries. The planet will survive us; the question is whether we survive ourselves.</p>
+                    <div class="future-stats">
+                        <div class="future-stat">
+                            <span class="future-stat-num">1.1&deg;C</span>
+                            <span class="future-stat-txt">Warmer since 1900</span>
+                        </div>
+                        <div class="future-stat">
+                            <span class="future-stat-num">3.6mm</span>
+                            <span class="future-stat-txt">Sea level rise / year</span>
+                        </div>
+                        <div class="future-stat">
+                            <span class="future-stat-num">1M+</span>
+                            <span class="future-stat-txt">Species at risk</span>
+                        </div>
+                    </div>
+                    <div class="cta-row">
+                        <button class="btn btn-primary" id="ctaExplore"><span>SEE THE FULL PICTURE →</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/><path d="M3.6 9h16.8M3.6 15h16.8"/></svg></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <div class="nav-logo">
+                        <div class="nav-logo-m" style="width: 22px; height: 22px; background: rgba(20, 25, 35, 0.9); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; color: white; letter-spacing: -0.5px;">M</div>
+                        <span class="nav-logo-text">EARTH</span>
+                    </div>
+                    <p class="footer-text">One planet. One chance. Built in Three.js + custom GLSL; because Earth deserved better than a stock template.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4 class="footer-heading">Navigate</h4>
+                        <a href="#s-hero">Home</a>
+                        <a href="#s-discover">Discover</a>
+                        <a href="#s-life">Life</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4 class="footer-heading">More</h4>
+                        <a href="#s-data">Data</a>
+                        <a href="#s-gallery">Gallery</a>
+                        <a href="#s-future">Future</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Earth Project</span>
+                <span>Every pixel, made with intent by Mir Sadat Bin Rakib 🔥.</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <audio id="backgroundMusic" src="/assets/m.mp3" loop preload="none"></audio>
+    <script type="module" src="./script.js"></script>
+</body>
+</html>
